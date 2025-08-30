@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="flex justify-center items-center">
+    <div class="max-w-md w-full bg-white shadow-xl rounded-lg p-8">
+        <!-- Heading Section -->
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Verify</h2>
+        <p class="text-gray-600 font-sm text-center">
+            Please enter the OTP sent to 
+            <span class="font-sm text-gray-6600 text-center">
+                ****{{ mobile|stringformat:"s"|slice:"-4:" }}
+            </span>
+        </p>
+
+        <!-- Form Section -->
+        <form id="otpForm" class="mt-6 space-y-6">
+            {% csrf_token %}
+            <div>
+                <label for="otp" class="block text-sm font-medium text-gray-700">
+                    Enter OTP
+                </label>
+                <input
+                    type="number"
+                    id="otp"
+                    name="otp"
+                    required 
+                    placeholder="Enter OTP" 
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+            </div>
+            <div class="flex justify-center items-center">
+                <button 
+                    type="button" 
+                    onclick="handleOtpVerification('{{ mobile }}')" 
+                    class="inline-block px-10 py-2 text-sm font-medium text-white bg-pink-600 border-2 border-gray-200 rounded-full transition-colors duration-500 ease-in-out hover:bg-cyan-600 hover:text-white focus:outline-none"
+                >
+                    Verify OTP
+                </button>
+            </div>
+        </form>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="mt-4 text-center hidden">
+            <!-- Error message will appear here -->
+        </div>
+
+        <!-- Resend OTP Section -->
+        <div class="mt-6 text-center">
+            <a 
+                id="resendLink" 
+                href="javascript:void(0)" 
+                class="text-blue-600 hover:text-blue-700 font-medium" 
+                onclick="handleResendOtp('{{ mobile }}')"
+            >
+                Resend OTP
+            </a>
+            <p id="resendMessage" class="mt-2 text-sm text-green-500 hidden">
+                <!-- Success or error messages for resending OTP -->
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const csrfToken = '{{ csrf_token }}';  // Ensure CSRF token is correctly injected
+
+    function handleOtpVerification(mobile) {
+        const otpInput = document.getElementById('otp');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Send the OTP to the backend for verification
+        fetch(`/verify-otp/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken'),  // CSRF token
+            },
+            body: new URLSearchParams({ otp: otpInput.value,
+                                        mobile: mobile
+                            }),  // Send the OTP as form data
+            })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                errorMessage.textContent = data.success;
+                errorMessage.classList.add('text-green-600');
+                errorMessage.classList.remove('hidden');
+
+                // Redirect to the contact page after a short delay
+                setTimeout(() => {
+                    window.location.href = data.redirect_url;
+                }, 1000); // 2-second delay
+            } else {
+                errorMessage.textContent = data.error;
+                errorMessage.classList.remove('hidden', 'text-green-600');
+                errorMessage.classList.add('text-red-600');
+            }
+        })
+        .catch(error => {
+            console.error('Error verifying OTP:', error);
+            errorMessage.textContent = 'An error occurred. Please try again.';
+            errorMessage.classList.remove('hidden');
+        });
+    }
+
+    function handleResendOtp(mobile) {
+        const resendLink = document.getElementById('resendLink');
+        const resendMessage = document.getElementById('resendMessage');
+
+        // Disable the Resend OTP link immediately to avoid multiple clicks
+        disableResendLink();
+
+        // Make an AJAX POST request to resend the OTP
+        fetch(`/resend-otp/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken'),  // CSRF token
+            },
+
+            body: new URLSearchParams({ 
+                            mobile: mobile
+                }),  // Send the OTP as form data
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Check if there was an error or success
+            if (data.success) {
+                resendMessage.textContent = data.success;  // Success message from the backend
+                resendMessage.classList.remove('hidden');  // Show the success message
+            } else {
+                resendMessage.textContent = data.error;  // Error message from the backend
+                resendMessage.classList.remove('hidden');  // Show the error message
+            }
+        })
+        .catch(error => {
+            console.error('Error resending OTP:', error);
+            resendMessage.textContent = "An error occurred. Please try again.";  // Generic error
+            resendMessage.classList.remove('hidden');
+        });
+    }
+
+    function disableResendLink() {
+        const resendLink = document.getElementById('resendLink');
+
+        // Disable the resend link immediately
+        resendLink.classList.add('text-gray-500', 'cursor-not-allowed');
+        resendLink.classList.remove('text-blue-600', 'hover:underline');
+        resendLink.style.pointerEvents = 'none';
+    }
+
+    // Utility function to get the CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+
+{% endblock %}

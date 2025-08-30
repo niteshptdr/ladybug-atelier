@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6 p-4">
+        {% for product in products %}
+        <a href="{% url 'product-detail' product.id %}">
+            <div class="bg-white rounded shadow p-0 text-center" >
+                <div class="product-image-wrapper aspect-w-1 aspect-h-1">
+                    {% if product.images.all|length > 0 %}
+                        <img src="{{ product.images.all.0.image.url }}" alt="{{ product.images.all.0.alt_text }}" class="w-full h-auto object-cover">
+                        {% if product.images.all|length > 1 %}
+                            <img src="{{ product.images.all.1.image.url }}" alt="{{ product.images.all.1.alt_text }}" class="w-full h-auto object-cover hover-image">
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <h2 class="text-sm text-gray-800 font-semibold mt-1 bg-gray-200">{{ product.name }}</h2>
+                <p class="text-xs ">{{ product.Category.category }}</p>
+                
+                <div class="">
+                    <span class="text-xs font-bold text-gary-800">
+                        ₹{{ product.price|floatformat:2 }}
+                    </span>
+                    {% if product.original_price %}
+                        <span class="text-xs line-through text-gray-500 ml-2">
+                            ₹{{ product.original_price|floatformat:2 }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                
+                <!-- {{rating}} -->
+                <div class="flex items-center justify-center space-x-1 mt-2">
+                {% with rating=product.average_rating|default:0 %}
+                    {% for i in "12345" %}
+                    {% with star_num=forloop.counter %}
+                        <svg class="w-5 h-5 {% if star_num <= rating %}text-yellow-400{% else %}text-gray-300{% endif %}" 
+                            fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                        </svg>
+                    {% endwith %}
+                    {% endfor %}
+                    <span class="text-sm text-gray-600 ml-2">{{ rating|floatformat:1 }}/5</span>
+                {% endwith %}
+                </div>
+                
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}

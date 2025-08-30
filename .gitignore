@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Django
+*.log
+db.sqlite3
+#/staticfiles/
+#media/
+
+# Environment
+.env
+venv/
+.env.*
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# Migrations (optional to ignore)
+**/migrations/__pycache__/
+
+
+.node_modules
+tailwindcss.exe
+
+whatsapp-bot/
+node_modules/
+media/

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10 p-6 bg-white shadow rounded-lg">
+    <h2 class="text-2xl font-semibold text-gray-800 text-center">Successfully Logged Out</h2>
+    <p class="text-sm text-gray-600 mt-4 text-center">
+        You have been logged out. See you again soon!
+    </p>
+
+    <div class="mt-6 text-center">
+        <a href="{% url 'login' %}" class="inline-block px-10 py-2 text-sm font-medium text-slate-600 border-2 border-gray-600 rounded-full transition-colors duration-500 ease-in-out hover:bg-cyan-600 hover:text-white focus:outline-none">
+            Login
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
+<!-- bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-500 transition duration-300 text-sm font-medium -->

@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+
+<div class=" bg-white border border-pink-200 rounded-xl p-2 shadow-sm mb-6">
+  <div class="lg:grid lg:grid-cols-2">
+    <div class="px-4 rounded bg-white"> 
+      {% if request.session.own_fabric %}
+        <h3 class="text-md font-semibold text-gray-600"> 
+          <i class="fas fa-scissors text-pink-600 mr-1"></i>
+          Fabric: Your Fabric </h3>
+        {% if request.session.pickup %}
+          <p class="text-sm text-gray-600 ms-6"> 
+            <i class="fas fa-truck text-gray-600 mr-1"></i>
+            Pickup will be arranged by Ladybug </p>
+            
+          {% else %}
+          <p class="text-sm text-gray-600 ms-6"> 
+            <i class="fas fa-box text-gray-600 mr-1"></i>
+            Send your fabric to Ladybug</p>
+        {% endif %}
+      {% else %}
+
+      <h3 class="text-md font-semibold text-gray-600 mb-2">
+        <i class="fas fa-scissors text-pink-600 mr-1"></i>
+        Fabric: {{ selected_fabric.name }}  </h3>
+      <img id="fabric_thumbnail" src="{{ selected_fabric.images.first.image.url }}" alt="" class="ms-6 h-12 aspect-[15/10] object-cover rounded-xl hover:cursor-pointer"
+      onclick="openImageModal('{{ selected_fabric.images.first.image.url }}')">
+
+        {% endif %}
+    </div>
+
+    <div class="px-4 rounded bg-white"> 
+      <h3 class="text-md font-semibold text-gray-600">
+        <i class="fas fa-tshirt text-pink-600 mr-1"></i>
+        Style: {{ selected_style.name }}  </h3>
+      <img id="style_thumbnail" src="{{ selected_style.images.first.image.url }}" alt="" class="ms-6 h-12 aspect-[15/10] object-cover rounded-xl hover:cursor-pointer"
+        onclick="openImageModal('{{ selected_style.images.first.image.url }}')">
+        
+    </div>
+  
+
+    <div class="px-4 rounded bg-white">
+
+    </div>
+
+  </div>
+  
+  <div class="mt-3 ms-4">
+    <a href="{% url 'select-style' %}" 
+      class="inline-flex items-center gap-1 text-sm text-pink-600 font-medium hover:text-pink-700 transition duration-150 ease-in-out">
+      <i class="fas fa-arrow-left"></i>
+      Back
+    </a>
+  </div>
+</div>
+
+
+  <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Enter Body Parameters </h2>
+  <hr class="mb-6">
+
+  <form method="post" class="space-y-6" id="measurementForm">
+    {% csrf_token %}
+
+    <!-- Tab Switch -->
+    <div class="flex justify-center gap-4">
+      <button type="button" id="customBtn" class="tab-btn bg-pink-600 text-white px-4 py-2 rounded-xl font-semibold shadow">Custom Size</button>
+      <button type="button" id="standardBtn" class="tab-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-semibold shadow">Standard Size</button>
+      
+      <input type="hidden" name="size_type" id="sizeTypeInput" value="custom">
+    </div>
+    {% if previous_measurements %}
+      <div class="rounded-xl bg-pink-100 p-4">
+        <p class="text-md">Your Body Parameters from a Previous Order</p>
+        
+        {% for key, value in previous_measurements.items %}
+            <span class="text-md text-gray-600">{{key}}: {{ value }} | </span>
+        {% endfor %}
+        
+      </div>
+    {% else %}
+    <div class="rounded-xl bg-pink-100 p-4">
+      <p class="text-md">Log in to access body measurements from your most recent order, if available.</p>
+    </div>
+    {% endif %}
+
+    <!-- Custom Size Section -->
+    <div id="customSection" class="space-y-4">
+      <div id="accordion" class="space-y-4">
+        {% for field in form %}
+          {% for guide in measurement_guides %}
+            {% if guide.name == field.name %}
+            <div class="border border-gray-200 rounded-xl shadow-sm transition-all duration-300 overflow-hidden ">
+              <button type="button"
+                class="w-full flex justify-between items-center px-6 py-4 bg-gray-50 hover:bg-pink-50 rounded-t-xl font-semibold text-left text-pink-700 text-lg accordion-toggle"
+                data-target="section-{{ forloop.parentloop.counter0 }}">
+                <span>{{ guide.name|title }}</span>
+                <svg class="h-5 w-5 transition-transform duration-300 text-pink-600 accordion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <div id="section-{{ forloop.parentloop.counter0 }}" class="accordion-content hidden px-6 pb-6 pt-4 bg-white">
+                <div class="flex flex-col sm:flex-row gap-6 items-center mb-4">
+                  <img src="{{ guide.image.url }}" alt="{{ guide.name }}" class="w-40 h-40 object-contain rounded-md border border-gray-200 shadow">
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ guide.name|title }}</h3>
+                    <p class="text-gray-600 text-sm">{{ guide.description }}</p>
+                  </div>
+                </div>
+                <div>
+                  <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
+                  <input 
+                      type="text"
+                      name="{{ field.name }}"
+                      id="{{ field.id_for_label }}"
+                      value="{{ field.value|default_if_none:'' }}"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Standard Size Section -->
+    <div id="standardSection" class="hidden space-y-6 bg-gray-50 p-4 rounded-xl">
+      <h4 class="font-semibold text-pink-700">Choose a Standard Size:</h4>
+      <div class="flex flex-wrap gap-3">
+        {% for size in size_chart_data %}
+          <button type="button" name="standard_size" value="{{ size.label }}"
+                  class="size-btn px-4 py-2 bg-gray-100 hover:bg-pink-100 rounded-lg shadow text-sm font-semibold"
+                  data-index="{{ forloop.counter0 }}">
+            {{ size.label }}
+          </button>
+        {% endfor %}
+        <input type="hidden" name="active_standard_size" id="active_standard_size">
+      </div>
+
+      <div id="parameterDisplay" class="hidden mt-4 bg-white rounded-lg p-4 border shadow">
+        <h5 class="text-pink-700 font-bold mb-2" id="selectedSizeLabel">Size:</h5>
+        <ul id="parameterList" class="text-gray-700 space-y-1 text-sm"></ul>
+      </div>
+    </div>
+
+      <!-- Success or error message display -->
+      {% if messages %}
+        <div class="mt-4 fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+          {% for message in messages %}
+            <div class="message-container text-sm px-3 py-2 mb-2 rounded border transition-opacity duration-500 ease-in-out
+              {% if 'error' in message.tags %}
+                text-red-700 bg-red-100 border-red-300
+              {% elif 'success' in message.tags %}
+                text-green-700 bg-green-100 border-green-300
+              {% elif 'warning' in message.tags %}
+                text-yellow-700 bg-yellow-100 border-yellow-300
+              {% else %}
+                text-blue-700 bg-blue-100 border-blue-300
+              {% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    
+    <div class="text-center pt-6">
+      <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg">
+        <i class="fas fa-arrow-right"></i>
+        Next: Give Preferences
+
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<!-- Accordion JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const toggles = document.querySelectorAll('.accordion-toggle');
+  const contents = document.querySelectorAll('.accordion-content');
+  const icons = document.querySelectorAll('.accordion-icon');
+
+  toggles.forEach((toggle, index) => {
+    toggle.addEventListener('click', function () {
+      const targetId = toggle.getAttribute('data-target');
+      contents.forEach((content, i) => {
+        if (content.id === targetId) {
+          const isOpen = !content.classList.contains('hidden');
+          content.classList.toggle('hidden', isOpen);
+          icons[i].classList.toggle('rotate-180', !isOpen);
+        } else {
+          content.classList.add('hidden');
+          icons[i].classList.remove('rotate-180');
+        }
+      });
+    });
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const customBtn = document.getElementById('customBtn');
+  const standardBtn = document.getElementById('standardBtn');
+  const customSection = document.getElementById('customSection');
+  const standardSection = document.getElementById('standardSection');
+  const sizeTypeInput = document.getElementById('sizeTypeInput');
+  const active_standard_size = document.getElementById('active_standard_size');
+
+  customBtn.addEventListener('click', () => {
+    customSection.classList.remove('hidden');
+    standardSection.classList.add('hidden');
+    customBtn.classList.replace('bg-gray-200', 'bg-pink-600');
+    customBtn.classList.replace('text-gray-700', 'text-white');
+    standardBtn.classList.replace('bg-pink-600', 'bg-gray-200');
+    standardBtn.classList.replace('text-white', 'text-gray-700');
+    sizeTypeInput.value = 'custom';
+  
+  });
+
+  standardBtn.addEventListener('click', () => {
+    customSection.classList.add('hidden');
+    standardSection.classList.remove('hidden');
+    standardBtn.classList.replace('bg-gray-200', 'bg-pink-600');
+    standardBtn.classList.replace('text-gray-700', 'text-white');
+    customBtn.classList.replace('bg-pink-600', 'bg-gray-200');
+    customBtn.classList.replace('text-white', 'text-gray-700');
+    sizeTypeInput.value = 'standard';
+  });
+
+  const sizeData = {{ size_chart_data|safe }};
+  const buttons = document.querySelectorAll('.size-btn');
+  const paramDisplay = document.getElementById('parameterDisplay');
+  const paramList = document.getElementById('parameterList');
+  const sizeLabel = document.getElementById('selectedSizeLabel');
+
+  buttons.forEach((btn, index) => {
+    btn.addEventListener('click', () => {
+      const sizeObj = sizeData[index];
+
+      buttons.forEach(b => b.classList.remove('ring-2', 'ring-pink-500'));
+      btn.classList.add('ring-2', 'ring-pink-500');
+      active_standard_size.value = `${sizeObj.label}`;
+
+      sizeLabel.textContent = `Size: ${sizeObj.label}`;
+      paramList.innerHTML = '';
+      sizeObj.parameters.forEach(p => {
+        paramList.innerHTML += `<li><strong>${p.name}:</strong> ${p.value}</li>`;
+      });
+
+      paramDisplay.classList.remove('hidden');
+    });
+  });
+
+
+
+  // Update based on session data
+  const defaultTab = '{{ selected_tab|default:"custom" }}';
+  const selectedSize = '{{ selected_standard_size|default:"" }}';
+
+  function activateTab(tab) {
+    if (tab === 'standard') {
+      standardBtn.click();
+    } else {
+      customBtn.click();
+    }
+  }
+
+  activateTab(defaultTab);
+  // Select previously chosen standard size if any
+  // const sizeData = {{ size_chart_data|safe }};
+  buttons.forEach((btn, index) => {
+    const sizeObj = sizeData[index];
+    if (sizeObj.label === selectedSize) {
+      btn.classList.add('ring-2', 'ring-pink-500');
+      active_standard_size.value = `${sizeObj.label}`;
+      sizeLabel.textContent = `Size: ${sizeObj.label}`;
+      paramList.innerHTML = '';
+      sizeObj.parameters.forEach(p => {
+        paramList.innerHTML += `<li><strong>${p.name}:</strong> ${p.value}</li>`;
+      });
+      paramDisplay.classList.remove('hidden');
+    }
+  });
+
+
+
+});
+
+
+
+
+
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const messages = document.querySelectorAll('.message-container');
+    messages.forEach(msg => {
+      setTimeout(() => {
+        msg.classList.add('opacity-0');
+        setTimeout(() => msg.remove(), 500); // remove after fade-out
+      }, 4000); // display for 2 seconds
+    });
+  });
+</script>
+
+{% endblock %}
+
+

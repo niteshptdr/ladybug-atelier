@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+
+
+  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center border border-gray-200">
+      <img src="{% static 'images/Ladybug_trns.png' %}" alt="Logo" class="h-20 sm:h-20 ms-4 rounded p-0 {% block logo_bg %}{% endblock %}">
+
+
+    <!-- Thank You Message -->
+     <i class="fa fa-exclamation-triangle text-red-500 text-6xl mb-4"></i>
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Oops! Something went wrong.</h2>
+    <p class="text-gray-600 mb-6"></p>
+
+    <!-- Optional CTA -->
+    <a href="{% url 'home' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-full shadow transition">
+      Shop
+    </a>
+  </div>
+</div>
+
+{% endblock content %}

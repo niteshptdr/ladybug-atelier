@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class=" w-full flex flex-col items-center justify-center p-6">
+
+
+<h1 class="text-2xl font-bold mt-4 mb-4 text-center">Your Cart</h1>
+
+{% if amount_in_wallet %}
+<div class="bg-white mb-2 rounded-lg shadow-sm p-2 flex flex-col justify-left w-full lg:w-[60rem]">
+  <p class="text-green-700 font-semibold"> Reward Balance in Your Wallet: ₹{{amount_in_wallet}}</p>
+  <p class="text-gray-600 text-sm"> Wallet balance will be applied during the next step of your order.</p>
+</div>
+{% endif %}
+
+
+  {% if cart_data %}
+
+  {% for item in cart_data %}
+  <div class="relative bg-white border border-pink-200 rounded-xl shadow-sm mb-6 w-full p-2 lg:w-[60rem]">
+
+    <div class="lg:grid lg:grid-cols-2">
+      {% if item.product %}
+
+        <div class="px-4 rounded bg-white"> 
+          <h3 class="text-md font-semibold text-gray-600">
+            <i class="fas fa-tshirt text-pink-600 mr-1"></i>
+            {{ item.product.name }}  </h3>
+          <img id="style_thumbnail" src="{{ item.product.images.all.0.image.url }}" alt="" class="ms-6 h-12 aspect-[10/12] object-cover rounded-xl hover:cursor-pointer"
+            onclick="openImageModal('{{ item.product.images.all.0.image.url }}')">
+        </div>
+
+      {% else %}
+        <div class="px-4 rounded bg-white"> 
+          {% if request.session.own_fabric %}
+            <h3 class="text-md font-semibold text-gray-600"> 
+              <i class="fas fa-scissors text-pink-600 mr-1"></i>
+              Fabric: Your Fabric </h3>
+            {% if request.session.pickup %}
+              <p class="text-sm text-gray-600 ms-6"> 
+                <i class="fas fa-truck text-gray-600 mr-1"></i>
+                Pickup will be arranged by Ladybug </p>
+                
+              {% else %}
+              <p class="text-sm text-gray-600 ms-6"> 
+                <i class="fas fa-box text-gray-600 mr-1"></i>
+                Send your fabric to Ladybug</p>
+              {% endif %}
+            {% else %}
+
+            <h3 class="text-md font-semibold text-gray-600 mb-2">
+              <i class="fas fa-scissors text-pink-600 mr-1"></i>
+              Fabric: {{ item.fabric_name }}  </h3>
+            <img id="fabric_thumbnail" src="{{ item.fabric_img }}" alt="" class="ms-6 h-12 aspect-[15/10] object-cover rounded-xl hover:cursor-pointer"
+            onclick="openImageModal('{{ item.fabric_img }}')">
+
+          {% endif %}
+          </div>
+                <div class="px-4 rounded bg-white"> 
+          <h3 class="text-md font-semibold text-gray-600">
+            <i class="fas fa-tshirt text-pink-600 mr-1"></i>
+            Style: {{ item.pattern_name }}  </h3>
+          <img id="style_thumbnail" src="{{ item.pattern_img }}" alt="" class="ms-6 h-12 aspect-[15/10] object-cover rounded-xl hover:cursor-pointer"
+            onclick="openImageModal('{{ item.pattern_img }}')">
+
+        </div>
+      {% endif %}
+
+      <div class="px-4 rounded bg-white">
+        <h3 class="text-md font-semibold text-gray-600"> 
+          <i class="fas fa-arrows-alt-h text-pink-600 mr-1"></i>
+          Measurements</h3>
+                
+                {% if item.measurements.Size %}
+                <p class="text-gray-600"> Standard Size <span class="text-gray-600 font-semibold"> ({{ item.measurements.Size }}) </span></p>
+                {% else %}
+                <p class="text-gray-600"> Custom Size</p>
+                {% endif %}
+
+              <ul class="text-sm text-gray-600 list-disc ms-6">
+
+              {% for key, value in item.measurements.items %}
+                  {% if key != "Size" %}
+                    <li>{{ key|capfirst }}: {{ value }}</li>
+                  {% endif %}
+              {% endfor %}
+            </ul>
+      </div>
+
+      <div class="px-4 rounded bg-white">
+
+        <h3 class="text-md font-semibold text-gray-600"> 
+          <i class="fas fa-arrows-alt-h text-pink-600 mr-1"></i>
+          Preferences</h3>
+              <ul class="text-sm text-gray-600 list-disc ms-6">
+              {% for key, value in item.options.items %}
+                <li>{{ key|capfirst }}: {{ value }}</li>
+              {% endfor %}
+            </ul>
+
+      </div>
+
+    </div>
+          <p class="text-gray-500">Expected delivery: Ships in 2 Days</p>
+              <!-- Actions & total -->
+          <div class="col-span-1 flex flex-col justify-between mt-6 ms-6 me-6">
+              <div class="p-4 bg-white rounded-xl shadow border w-full max-w-xs space-y-1">
+                <p class="font-semibold text-gray-600">Original Price:</p>
+                <p class="text-md line-through text-gray-500">₹{{ item.original_price|floatformat:2 }}</p>
+
+                <p class="font-semibold text-gray-600">Discount:</p>
+                <p class="text-md text-green-600">− ₹{{ item.discount_amount|floatformat:2 }}</p>
+
+                <p class="font-semibold text-gray-600">Final Price:</p>
+                <p class="text-lg font-bold text-gray-800">₹{{ item.final_price|floatformat:2 }}</p>
+              </div>
+
+            <div class="mt-4 space-y-2">
+              <form action="{% url 'cart' %}" method="post" class="{% if item.out_of_stock %}opacity-50 pointer-events-none{% endif %}">
+                {% csrf_token %}
+                    <input type="hidden" name="action" value="order">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                <button class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg">Order</button>
+              </form>
+              <form action="{% url 'cart' %}" method="post">
+                {% csrf_token %}
+                    <input type="hidden" name="action" value="remove">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                <button class="w-full border border-red-400 text-red-600 hover:bg-red-100 font-medium py-1 px-4 rounded-lg">Remove</button>
+              </form>
+            </div>
+
+
+                      <!-- Out of Stock Badge -->
+          {% if item.out_of_stock %}
+          <div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+              Out of Stock
+          </div>
+          {% endif %}
+          
+          </div>
+
+
+
+
+    </div>
+  {% endfor %}
+
+  {% else %}
+    <p class="text-center text-gray-500">Your cart is empty.</p>
+  {% endif %}
+
+
+  <!-- Order all button -->
+  <!-- <div class="mt-8 text-center">
+    <form action="{% url 'home' %}" method="post">
+      {% csrf_token %}
+      <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl">Place Order for All</button>
+    </form>
+  </div> -->
+
+</div>
+
+  <!-- Success or error message display -->
+  {% if messages %}
+    <div class="mt-4 fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+      {% for message in messages %}
+        <div class="message-container text-sm px-3 py-2 mb-2 rounded border transition-opacity duration-500 ease-in-out
+          {% if 'error' in message.tags %}
+            text-red-700 bg-red-100 border-red-300
+          {% elif 'success' in message.tags %}
+            text-green-700 bg-green-100 border-green-300
+          {% elif 'warning' in message.tags %}
+            text-yellow-700 bg-yellow-100 border-yellow-300
+          {% else %}
+            text-blue-700 bg-blue-100 border-blue-300
+          {% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const messages = document.querySelectorAll('.message-container');
+    messages.forEach(msg => {
+      setTimeout(() => {
+        msg.classList.add('opacity-0');
+        setTimeout(() => msg.remove(), 500); // remove after fade-out
+      }, 4000); // display for 2 seconds
+    });
+  });
+</script>
+
+
+{% endblock content %}

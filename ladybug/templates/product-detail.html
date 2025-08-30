@@ -1,0 +1,631 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <style>
+    .thumbnail-active {
+      border: 2px solid #bd1756; /* Tailwind blue-600 */
+    }
+  </style>
+
+  <div class="max-w-6xl mx-auto bg-white p-4 rounded shadow grid grid-cols-1 md:grid-cols-2 gap-8 mt-2">
+
+    <!-- Left: Images -->
+    <div>
+      {% if product.images.all %}
+        <!-- <div class="relative"> -->
+
+
+          <!-- <img
+            id="main-product-image"
+            src="{{ product.images.all.0.image.url }}"
+            alt="{{ product.name }}"
+            class="w-full h-auto rounded mb-4 object-cover shadow"
+          > -->
+
+          <div class="relative" >
+            <div id="main-media-container">
+              <img
+                id="main-product-image"
+                src="{{ product.images.first.image.url }}"
+                class="w-full h-auto rounded mb-4 object-cover shadow"
+                alt="{{ product.name }}"
+              >
+            </div>
+
+
+            <!-- Arrows -->
+            <button onclick="prevImage()" class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/70 p-2 rounded-full hover:bg-white shadow">
+              
+              <i class="fa fa-arrow-left text-grat-500"> </i>
+            </button>
+            <button onclick="nextImage()" class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white/70 p-2 rounded-full hover:bg-white shadow">
+              <i class="fa fa-arrow-right text-grat-500"> </i>
+            </button>
+          </div>
+
+        <!-- Thumbnails -->
+        <!-- <div id="thumbnail-container" class="flex flex-wrap gap-2">
+          {% for img in product.images.all %}
+            <img 
+              src="" 
+              data-index="{{ forloop.counter0 }}"
+              alt=""
+              class="thumbnail w-20 h-20 object-cover rounded cursor-pointer border"
+              onclick="setImage({{ forloop.counter0 }})"
+            >
+          {% endfor %}
+        </div> -->
+
+
+        <!-- Thumbnails -->
+        <div id="thumbnail-container" class="flex flex-wrap gap-2 mt-2">
+          {% for m in product.images.all %}
+            {% if m.media_type == 'image' %}
+              <img 
+                src="{{ m.image.url }}" 
+                class="thumbnail w-20 h-20 object-cover rounded cursor-pointer border"
+                data-index="{{ forloop.counter0 }}"
+                onclick="setMedia({{ forloop.counter0 }})"
+              >
+            {% elif m.media_type == 'video' %}
+              <img 
+                src="{{ m.thumbnail.url }}" 
+                class="thumbnail w-20 h-20 object-cover rounded cursor-pointer border relative"
+                data-index="{{ forloop.counter0 }}"
+                onclick="setMedia({{ forloop.counter0 }})"
+              >
+            {% endif %}
+          {% endfor %}
+        </div>
+
+
+
+
+      {% endif %}
+    </div>
+
+    <!-- Right: Details -->
+    <div>
+
+                <h2 class="text-sm text-gray-800 font-semibold mt-1 bg-gray-200">{{ product.name }}</h2>
+                <p class="text-xs ">{{ product.Category.category }}</p>
+
+                {% if product.total_reviews > 0 %}
+                <div id="ratingSection" class="cursor-pointer">
+                      <!-- Product Rating Summary -->
+                      <div class="mb-6">
+                        <div class="flex items-center space-x-2 mt-2">
+                          <span class="text-gray-600 text-sm font-semibold">{{ product.average_rating|floatformat:1 }}/5</span>
+                          <div class="flex">
+                            {% for i in "12345" %}
+                              {% with star=forloop.counter %}
+                                <svg class="w-5 h-5 {% if star <= product.average_rating %}text-gray-600{% else %}text-gray-300{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                                </svg>
+                              {% endwith %}
+                            {% endfor %}
+                          </div>
+                          <span class="text-gray-600">({{ product.total_reviews }} ratings)</span>
+                        </div>
+                      </div>
+                </div>
+                {% endif %}
+                
+                <div class="">
+                    <span class="text-xs font-bold text-gary-800">
+                        ₹{{ product.final_price|floatformat:2 }}
+                    </span>
+                    {% if product.original_price %}
+                        <span class="text-xs line-through text-gray-500 ml-2">
+                            ₹{{ product.original_price|floatformat:2 }}
+                        </span>
+                    {% endif %}
+
+                    {% if product.final_price < product.price %}
+                          <span class="text-green-500 text-xs ml-1">Flat Discount Applied</span>
+                    {% endif %}
+                </div>
+
+        <p class="text-sm text-pink-800 mt-2"> Available in Custom and Standard Sizes</p>
+        <p class="text-sm text-gray-500 mt-2">
+        {{ product.units_inStock }} in stock
+      </p>
+
+      <!-- Add to Cart -->
+      <form method="POST" action="{% url 'product-measurements' product.id %}" class="mt-4">
+        {% csrf_token %}
+
+        <button type="submit" class="bg-pink-600 text-white px-6 py-2 rounded hover:bg-pink-700 transition">
+          Select Size
+        </button>
+        <input type="text" name ="product_id" id =  "product_id" class="hidden" value="{{ product.id }}">
+      </form>
+
+    </div>
+
+  </div>
+
+<div class="max-w-6xl mx-auto">
+
+  {% if color_options %}
+  <h2 class="text-lg lg:text-2xl font-bold mt-6 mb-2 text-left ms-4">Color Options</h2>
+  <div class="flex overflow-x-auto space-x-6 pb-4 mb-6 scroll-smooth snap-x px-4">
+      <div class="flex justify-center gap-6 snap-x">
+            {% for product in color_options %}
+          <a href="{% url 'product-detail' product.id %}">
+              <div class="bg-white shadow p-0 text-center rounded w-48" >
+                  <div class="product-image-wrapper aspect-w-1 aspect-h-1 rounded">
+                      {% if product.images.all|length > 0 %}
+                          <img src="{{ product.images.all.0.image.url }}" alt="{{ product.images.all.0.alt_text }}" class="w-full h-auto object-cover">
+                          {% if product.images.all|length > 1 %}
+                              <img src="{{ product.images.all.1.image.url }}" alt="{{ product.images.all.1.alt_text }}" class="w-full h-auto object-cover hover-image">
+                          {% endif %}
+                      {% endif %}
+                  </div>
+
+                  <h2 class="text-sm text-gray-800 font-semibold bg-gray-200">{{ product.name }}</h2>
+                  <p class="text-xs ">{{ product.Category.category }}</p>
+                  
+                  <div class="">
+                      <span class="text-xs font-bold text-gary-800">
+                          ₹{{ product.final_price|floatformat:2 }}
+                      </span>
+                      {% if product.original_price %}
+                          <span class="text-xs line-through text-gray-500 ml-2">
+                              ₹{{ product.original_price|floatformat:2 }}
+                          </span>
+                      {% endif %}
+                        
+                        {% if product.final_price < product.price %}
+                            <span class="text-green-500 text-xs ml-1">Flat Discount Applied</span>
+                        {% endif %}
+                  </div>
+
+                  
+
+                  <div class="flex items-center space-x-1 mt-1 shrink-0">
+                    
+                  {% with rating=product.average_rating|default:0 %}
+                    {% if rating > 0 %}
+                      {% for i in "12345" %}
+                        {% with star_num=forloop.counter %}
+                          <svg class="w-4 h-4 {% if star_num <= rating %}text-yellow-400{% else %}text-gray-300{% endif %}" 
+                              fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                          </svg>
+                        {% endwith %}
+                      {% endfor %}
+                      <span class="text-xs text-gray-600 ml-1">{{ rating|floatformat:1 }}/5</span>
+                    {% else %}
+                    <div class="text-xs text-gray-400 italic text-center w-full"> Start the trend – rate it! </div>
+                    {% endif %}
+                  {% endwith %}
+                  
+                </div>
+
+                <div class="flex items-center justify-center mt-1 text-gray-500 text-xs">
+                  <i class="fa fa-eye mr-1 text-gray-400"></i>
+                  {{ product.views }} views
+                </div>
+                  
+              </div>
+          </a>
+          {% endfor %}
+      </div>
+  </div>
+  {% endif %}
+
+  {% if similar_fabric_products %}
+  <h2 class="text-lg lg:text-2xl font-bold mt-6 mb-2 text-left ms-4"> In Similar Fabric </h2>
+  <div class="flex overflow-x-auto space-x-6 pb-4 mb-6 scroll-smooth snap-x px-4">
+      <div class="flex justify-center gap-6 snap-x">
+            {% for product in similar_fabric_products %}
+          <a href="{% url 'product-detail' product.id %}">
+              <div class="bg-white shadow p-0 text-center rounded w-48" >
+                  <div class="product-image-wrapper aspect-w-1 aspect-h-1 rounded">
+                      {% if product.images.all|length > 0 %}
+                          <img src="{{ product.images.all.0.image.url }}" alt="{{ product.images.all.0.alt_text }}" class="w-full h-auto object-cover">
+                          {% if product.images.all|length > 1 %}
+                              <img src="{{ product.images.all.1.image.url }}" alt="{{ product.images.all.1.alt_text }}" class="w-full h-auto object-cover hover-image">
+                          {% endif %}
+                      {% endif %}
+                  </div>
+
+                  <h2 class="text-sm text-gray-800 font-semibold bg-gray-200">{{ product.name }}</h2>
+                  <p class="text-xs ">{{ product.Category.category }}</p>
+                  
+                  <div class="">
+                      <span class="text-xs font-bold text-gary-800">
+                          ₹{{ product.final_price|floatformat:2 }}
+                      </span>
+                      {% if product.original_price %}
+                          <span class="text-xs line-through text-gray-500 ml-2">
+                              ₹{{ product.original_price|floatformat:2 }}
+                          </span>
+                      {% endif %}
+                        
+                        {% if product.final_price < product.price %}
+                            <span class="text-green-500 text-xs ml-1">Flat Discount Applied</span>
+                        {% endif %}
+                  </div>
+
+                  
+
+                  <div class="flex items-center space-x-1 mt-1 shrink-0">
+                    
+                  {% with rating=product.average_rating|default:0 %}
+                    {% if rating > 0 %}
+                      {% for i in "12345" %}
+                        {% with star_num=forloop.counter %}
+                          <svg class="w-4 h-4 {% if star_num <= rating %}text-yellow-400{% else %}text-gray-300{% endif %}" 
+                              fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                          </svg>
+                        {% endwith %}
+                      {% endfor %}
+                      <span class="text-xs text-gray-600 ml-1">{{ rating|floatformat:1 }}/5</span>
+                    {% else %}
+                    <div class="text-xs text-gray-400 italic text-center w-full"> Start the trend – rate it! </div>
+                    {% endif %}
+                  {% endwith %}
+                  
+                </div>
+
+                <div class="flex items-center justify-center mt-1 text-gray-500 text-xs">
+                  <i class="fa fa-eye mr-1 text-gray-400"></i>
+                  {{ product.views }} views
+                </div>
+                  
+              </div>
+          </a>
+          {% endfor %}
+      </div>
+  </div>
+  {% endif %}
+
+  {% if similar_pattern_products %}
+  <h2 class="text-lg lg:text-2xl font-bold mt-6 mb-2 text-left ms-4"> In Similar Style </h2>
+  <div class="flex overflow-x-auto space-x-6 pb-4 mb-6 scroll-smooth snap-x px-4">
+      <div class="flex justify-center gap-6 snap-x">
+            {% for product in similar_pattern_products %}
+          <a href="{% url 'product-detail' product.id %}">
+              <div class="bg-white shadow p-0 text-center rounded w-48" >
+                  <div class="product-image-wrapper aspect-w-1 aspect-h-1 rounded">
+                      {% if product.images.all|length > 0 %}
+                          <img src="{{ product.images.all.0.image.url }}" alt="{{ product.images.all.0.alt_text }}" class="w-full h-auto object-cover">
+                          {% if product.images.all|length > 1 %}
+                              <img src="{{ product.images.all.1.image.url }}" alt="{{ product.images.all.1.alt_text }}" class="w-full h-auto object-cover hover-image">
+                          {% endif %}
+                      {% endif %}
+                  </div>
+
+                  <h2 class="text-sm text-gray-800 font-semibold bg-gray-200">{{ product.name }}</h2>
+                  <p class="text-xs ">{{ product.Category.category }}</p>
+                  
+                  <div class="">
+                      <span class="text-xs font-bold text-gary-800">
+                          ₹{{ product.final_price|floatformat:2 }}
+                      </span>
+                      {% if product.original_price %}
+                          <span class="text-xs line-through text-gray-500 ml-2">
+                              ₹{{ product.original_price|floatformat:2 }}
+                          </span>
+                      {% endif %}
+                        
+                        {% if product.final_price < product.price %}
+                            <span class="text-green-500 text-xs ml-1">Flat Discount Applied</span>
+                        {% endif %}
+                  </div>
+
+                  
+
+                  <div class="flex items-center space-x-1 mt-1 shrink-0">
+                    
+                  {% with rating=product.average_rating|default:0 %}
+                    {% if rating > 0 %}
+                      {% for i in "12345" %}
+                        {% with star_num=forloop.counter %}
+                          <svg class="w-4 h-4 {% if star_num <= rating %}text-yellow-400{% else %}text-gray-300{% endif %}" 
+                              fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                          </svg>
+                        {% endwith %}
+                      {% endfor %}
+                      <span class="text-xs text-gray-600 ml-1">{{ rating|floatformat:1 }}/5</span>
+                    {% else %}
+                    <div class="text-xs text-gray-400 italic text-center w-full"> Start the trend – rate it! </div>
+                    {% endif %}
+                  {% endwith %}
+                  
+                </div>
+
+                <div class="flex items-center justify-center mt-1 text-gray-500 text-xs">
+                  <i class="fa fa-eye mr-1 text-gray-400"></i>
+                  {{ product.views }} views
+                </div>
+                  
+              </div>
+          </a>
+          {% endfor %}
+      </div>
+  </div>
+  {% endif %}
+
+  {% if explore_more %}
+  <h2 class="text-lg lg:text-2xl font-bold mt-6 mb-2 text-left ms-4">Explore More</h2>
+  <div class="flex overflow-x-auto space-x-6 pb-4 mb-6 scroll-smooth snap-x px-4">
+      <div class="flex justify-center gap-6 snap-x">
+            {% for product in explore_more %}
+          <a href="{% url 'product-detail' product.id %}">
+              <div class="bg-white shadow p-0 text-center rounded w-48" >
+                  <div class="product-image-wrapper aspect-w-1 aspect-h-1 rounded">
+                      {% if product.images.all|length > 0 %}
+                          <img src="{{ product.images.all.0.image.url }}" alt="{{ product.images.all.0.alt_text }}" class="w-full h-auto object-cover">
+                          {% if product.images.all|length > 1 %}
+                              <img src="{{ product.images.all.1.image.url }}" alt="{{ product.images.all.1.alt_text }}" class="w-full h-auto object-cover hover-image">
+                          {% endif %}
+                      {% endif %}
+                  </div>
+
+                  <h2 class="text-sm text-gray-800 font-semibold bg-gray-200">{{ product.name }}</h2>
+                  <p class="text-xs ">{{ product.Category.category }}</p>
+                  
+                  <div class="">
+                      <span class="text-xs font-bold text-gary-800">
+                          ₹{{ product.final_price|floatformat:2 }}
+                      </span>
+                      {% if product.original_price %}
+                          <span class="text-xs line-through text-gray-500 ml-2">
+                              ₹{{ product.original_price|floatformat:2 }}
+                          </span>
+                      {% endif %}
+                        
+                        {% if product.final_price < product.price %}
+                            <span class="text-green-500 text-xs ml-1">Flat Discount Applied</span>
+                        {% endif %}
+                  </div>
+
+                  
+
+                  <div class="flex items-center space-x-1 mt-1 shrink-0">
+                    
+                  {% with rating=product.average_rating|default:0 %}
+                    {% if rating > 0 %}
+                      {% for i in "12345" %}
+                        {% with star_num=forloop.counter %}
+                          <svg class="w-4 h-4 {% if star_num <= rating %}text-yellow-400{% else %}text-gray-300{% endif %}" 
+                              fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                          </svg>
+                        {% endwith %}
+                      {% endfor %}
+                      <span class="text-xs text-gray-600 ml-1">{{ rating|floatformat:1 }}/5</span>
+                    {% else %}
+                    <div class="text-xs text-gray-400 italic text-center w-full"> Start the trend – rate it! </div>
+                    {% endif %}
+                  {% endwith %}
+                  
+                </div>
+
+                <div class="flex items-center justify-center mt-1 text-gray-500 text-xs">
+                  <i class="fa fa-eye mr-1 text-gray-400"></i>
+                  {{ product.views }} views
+                </div>
+                  
+              </div>
+          </a>
+          {% endfor %}
+      </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="max-w-6xl mx-auto my-8 rounded-lg shadow-lg p-4" id="reviews">
+    <!-- Product Rating Summary -->
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">Customer Reviews</h2>
+      <div class="flex items-center space-x-2 mt-2">
+        <span class="text-gray-600 text-md font-semibold">{{ product.average_rating|floatformat:1 }}/5</span>
+        <div class="flex">
+          {% for i in "12345" %}
+            {% with star=forloop.counter %}
+              <svg class="w-5 h-5 {% if star <= product.average_rating %}text-gray-600{% else %}text-gray-200{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+              </svg>
+            {% endwith %}
+          {% endfor %}
+        </div>
+        <span class="text-gray-600">({{ product.total_reviews }} reviews)</span>
+      </div>
+    </div>
+
+    <!-- Individual Reviews -->
+    <div class="flex overflow-x-auto space-x-6 pb-4 mb-6 scroll-smooth snap-x px-4">
+      {% for review in reviews %}
+
+      <div class="">
+        <div class="bg-white p-4 rounded shadow-sm border">
+          <div class="flex items-center justify-center mb-2">
+            <h4 class="font-semibold text-gray-800">{{ review.reviewer.name }}</h4>
+          </div>
+
+          <div class="flex justify-center">
+            <div class="flex space-x-1">
+              {% for i in "12345" %}
+                {% with star=forloop.counter %}
+                  <svg class="w-4 h-4 {% if star <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                  </svg>
+                {% endwith %}
+              {% endfor %}
+            </div>
+          </div>
+            
+                <div class="flex flex-col items-center text-center space-y-2">
+                  {% if review.comment %}
+                    <p class="text-gray-700">{{ review.comment }}</p>
+                  {% endif %}
+
+                  {% if review.image %}
+                    <img src="{{ review.image.url }}" alt="Review image" 
+                    class="h-20 rounded shadow border mx-auto"
+                    onclick="openImageModal('{{ review.image.url }}')">
+                  {% endif %}
+
+                  <p class="text-sm text-gray-500">Reviewed on {{ review.created_at|date:"F j, Y" }}</p>
+                </div>
+              {% empty %}
+                <p class="text-gray-500">No reviews yet. Be the first to review this product.</p>
+              {% endfor %}
+
+
+          </div>
+
+      </div>
+    </div>
+</div>
+
+
+  <!-- Script -->
+  <script>
+    
+    // const images = [
+    //   {% for img in product.images.all %}
+    //     "",
+    //   {% endfor %}
+    // ];
+
+    // let currentIndex = 0;
+
+    // const mainImage = document.getElementById('main-product-image');
+    // const thumbnails = document.querySelectorAll('.thumbnail');
+
+    // function updateMainImage() {
+    //   mainImage.src = images[currentIndex];
+    //   thumbnails.forEach((thumb, i) => {
+    //     thumb.classList.toggle('thumbnail-active', i === currentIndex);
+    //   });
+    // }
+
+    // function nextImage() {
+    //   currentIndex = (currentIndex + 1) % images.length;
+    //   updateMainImage();
+    // }
+
+    // function prevImage() {
+    //   currentIndex = (currentIndex - 1 + images.length) % images.length;
+    //   updateMainImage();
+    // }
+
+    // function setImage(index) {
+    //   currentIndex = index;
+    //   updateMainImage();
+    // }
+
+    // // Touch swipe support
+    // let startX = 0;
+
+    // mainImage.addEventListener('touchstart', (e) => {
+    //   startX = e.touches[0].clientX;
+    // });
+
+    // mainImage.addEventListener('touchend', (e) => {
+    //   const endX = e.changedTouches[0].clientX;
+    //   if (startX - endX > 50) nextImage();      // swipe left
+    //   if (endX - startX > 50) prevImage();      // swipe right
+    // });
+
+    // // Initialize
+    // updateMainImage();
+
+  const media = [
+            {% for m in product.images.all %}
+              {
+                type: "{{ m.media_type }}",
+                src: "{% if m.media_type == 'image' %}{{ m.image.url }}{% else %}{{ m.video.url }}{% endif %}",
+                thumb: "{% if m.media_type == 'image' %}{{ m.image.url }}{% else %}{{ m.thumbnail.url }}{% endif %}"
+              }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          ];
+
+      let currentIndex = 0;
+
+      const mainContainer = document.getElementById('main-media-container');
+      const thumbnails = document.querySelectorAll('.thumbnail');
+
+      function updateMainMedia() {
+        const item = media[currentIndex];
+        mainContainer.innerHTML = '';
+
+        if (item.type === 'image') {
+          const img = document.createElement('img');
+          img.src = item.src;
+          img.alt = 'Product Image';
+          img.className = 'w-full h-auto rounded mb-4 object-cover shadow';
+          mainContainer.appendChild(img);
+        } else if (item.type === 'video') {
+          const video = document.createElement('video');
+          video.src = item.src;
+          video.controls = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          video.className = 'w-full h-auto rounded mb-4 object-cover shadow';
+          mainContainer.appendChild(video);
+        }
+
+        thumbnails.forEach((thumb, i) => {
+          thumb.classList.toggle('thumbnail-active', i === currentIndex);
+        });
+      }
+
+      function nextImage() {
+        currentIndex = (currentIndex + 1) % media.length;
+        updateMainMedia();
+      }
+
+      function prevImage() {
+        currentIndex = (currentIndex - 1 + media.length) % media.length;
+        updateMainMedia();
+      }
+
+      function setMedia(index) {
+        currentIndex = index;
+        updateMainMedia();
+      }
+
+      // Swipe Support
+      let startX = 0;
+      mainContainer.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+      });
+      mainContainer.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) nextImage();      // swipe left
+        if (endX - startX > 50) prevImage();      // swipe right
+      });
+
+      // Initialize
+      updateMainMedia();
+
+      // Scroll to reviews
+      document.getElementById('ratingSection')?.addEventListener('click', function () {
+        const reviewSection = document.getElementById('reviews');
+        if (reviewSection) {
+          reviewSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+
+
+
+
+
+    document.getElementById('ratingSection').addEventListener('click', function () {
+      const reviewSection = document.getElementById('reviews');
+      if (reviewSection) {
+        reviewSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+  </script>
+
+{% endblock %}

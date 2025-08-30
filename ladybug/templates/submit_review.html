@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+
+
+
+<div class="max-w-xl mx-auto bg-white shadow-xl rounded-2xl p-6 mt-10 border border-gray-200">
+  <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Share Your Thoughts on Your Recent Purchase </h2>
+
+  <div class="divide-y flex justify-center">
+    {% for item in order.items.all %}
+      <div class="py-3 flex gap-4 items-start">
+        {% if item.product %}
+          <img src="{{ item.product.images.first.image.url }}" alt="Product" 
+                      class="w-20 h-20 object-cover rounded border cursor-pointer hover:scale-105 transition"
+                      onclick="openImageModal('{{ item.product.images.first.image.url }}')">
+        {% else %}
+          <img src="{{ item.fabric.images.first.image.url }}" alt="Fabric"             
+            class="w-20 h-20 object-cover rounded border cursor-pointer hover:scale-105 transition"
+            onclick="openImageModal('{{ item.fabric.images.first.image.url }}')">
+          <img src="{{ item.pattern.images.first.image.url }}" alt="Pattern" 
+            class="w-20 h-20 object-cover rounded border cursor-pointer hover:scale-105 transition"
+            onclick="openImageModal('{{ item.pattern.images.first.image.url }}')">
+        {% endif %}
+
+        <div class="flex-1 text-sm">
+          {% if item.product %}
+            <p class="font-medium">{{ item.product.name }}</p>
+            <p class="text-gray-500">{{ item.product.description|truncatechars:100 }}</p>
+          {% else %}
+            <p class="font-medium text-pink-600">Custom Design</p>
+            <p class="text-gray-500">Fabric: {{ item.fabric.name }} | Pattern: {{ item.pattern.name }}</p>
+          {% endif %}
+
+          <p class="mt-1">Quantity: {{ item.quantity }}</p>
+
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+
+  <form method="POST" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- Star Rating -->
+     <p class="text-lg text-gray-800 flex justify-center"> Rate your purchase </p>
+    <div class="flex justify-center gap-1" id="star-wrapper">
+      
+      {% for i in "12345" %}
+        <svg data-value="{{ i }}" class="star w-10 h-10 transition-colors duration-200 fill-gray-300 hover:fill-yellow-400 cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <polygon points="10,1 12,7 18,7 13,11 15,17 10,13 5,17 7,11 2,7 8,7"/>
+        </svg>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="rating" id="rating">
+
+    <!-- Comment -->
+    <div>
+      <label for="comment" class="block text-sm font-medium text-gray-700">Comment</label>
+      <textarea name="comment" id="comment" rows="4" class="mt-1 block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm p-3" placeholder="Write something helpful for others..."></textarea>
+    </div>
+
+    <!-- Image Upload -->
+    <div>
+      <label for="image" class="block text-sm font-medium text-gray-700">Upload an Image <span class="text-gray-400">(optional)</span></label>
+      <input type="file" name="image" id="image" accept="image/*" class="mt-1 block w-full text-sm border-gray-300 rounded-xl shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 transition-colors text-white font-medium py-2 px-6 rounded-full shadow-md">Submit Review</button>
+    </div>
+  </form>
+</div>
+
+<!-- Star Rating Script -->
+<script>
+  const stars = document.querySelectorAll('.star');
+  const ratingInput = document.getElementById('rating');
+
+  stars.forEach((star, idx) => {
+    star.addEventListener('click', () => {
+      const rating = idx + 1;
+      ratingInput.value = rating;
+
+      stars.forEach((s, i) => {
+        s.classList.toggle('fill-yellow-400', i < rating);
+        s.classList.toggle('fill-gray-300', i >= rating);
+      });
+    });
+  });
+</script>
+
+{% endblock content %}

@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+<!-- Modal -->
+<div id="productModal"
+     class="fixed inset-0 z-50 hidden bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center px-4 sm:px-6">
+  
+  <!-- Modal Box -->
+  <div class="relative bg-white rounded-2xl p-4 sm:p-6 shadow-xl w-full max-w-md sm:max-w-lg">
+
+    <!-- Close Button (top-right, above modal) -->
+    <button id="closeModal"
+            class="absolute -top-4 -right-4 bg-white text-gray-600 text-xl p-2 rounded-full shadow-lg hover:bg-rose-200 transition z-50">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Image Container -->
+    <div id="modalImageContainer" class="relative">
+
+      <!-- Main Image -->
+      <img id="modalImage" src="" alt=""
+           class="w-full aspect-square object-contain rounded-xl shadow mb-6" />
+
+      <!-- Previous Button -->
+      <button id="prevBtn2"
+              class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white text-2xl text-gray-600 p-2 rounded-full shadow hover:bg-pink-100 transition">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <!-- Next Button -->
+      <button id="nextBtn2"
+              class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white text-2xl text-gray-600 p-2 rounded-full shadow hover:bg-pink-100 transition">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+    </div>
+
+    <!-- Product Detail Link -->
+    <div class="text-center mt-4">
+      <a id="productDetailLink" href="#"
+         class="text-pink-600 underline font-medium text-lg hover:text-pink-800 transition">
+        View Product Details
+      </a>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="max-w-7xl mx-auto py-8 px-4">
+
+
+<div class=" bg-white border border-pink-200 rounded-xl p-2 shadow-sm mb-6">
+  <div class="lg:grid lg:grid-cols-2">
+    <div class="px-4 rounded bg-white"> 
+      {% if request.session.own_fabric %}
+        <h3 class="text-md font-semibold text-gray-600"> 
+          <i class="fas fa-scissors text-pink-600 mr-1"></i>
+          Fabric: Your Fabric </h3>
+        {% if request.session.pickup %}
+          <p class="text-sm text-gray-600 ms-6"> 
+            <i class="fas fa-truck text-gray-600 mr-1"></i>
+            Pickup will be arranged by Ladybug </p>
+            
+          {% else %}
+          <p class="text-sm text-gray-600 ms-6"> 
+            <i class="fas fa-box text-gray-600 mr-1"></i>
+            Send your fabric to Ladybug</p>
+        {% endif %}
+      {% else %}
+
+      <h3 class="text-md font-semibold text-gray-600 mb-2">
+        <i class="fas fa-scissors text-pink-600 mr-1"></i>
+        Fabric: {{ selected_fabric.name }}  </h3>
+      <img id="fabric_thumbnail" src="{{ selected_fabric.images.first.image.url }}" alt="" class="ms-6 h-12 aspect-[15/10] object-cover rounded-xl hover:cursor-pointer"
+      onclick="openImageModal('{{ selected_fabric.images.first.image.url }}')">
+
+        {% endif %}
+    </div>
+
+
+
+    <div class="px-4 rounded bg-white">
+
+    </div>
+
+  </div>
+  
+  <div class="mt-3 ms-4">
+            {% if request.session.own_fabric%}
+          {% url 'select-pickup-option' as back_url %}
+        {% else %}
+          {% url 'select-fabric' as back_url %}
+        {% endif %}
+
+    <a href="{{back_url}}" 
+      class="inline-flex items-center gap-1 text-sm text-pink-600 font-medium hover:text-pink-700 transition duration-150 ease-in-out">
+      <i class="fas fa-arrow-left"></i>
+      Back
+    </a>
+  </div>
+</div>
+
+ 
+
+  <h2 class="text-2xl font-bold text-center mb-2">Select Style</h2>
+  <hr class="mb-6">
+
+<div class="lg:grid lg:grid-cols-2 lg:gap-4">
+<div>
+  <!-- Main Image Carousel -->
+  <div id="carousel" class="mb-6 relative">
+    <img id="mainImage" src="{{ patterns.0.images.first.image.url }}" alt="" class="w-full aspect-[15/10] object-cover rounded-xl">
+    <button id="prevBtn" class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white p-2 rounded-full shadow">❮</button>
+    <button id="nextBtn" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white p-2 rounded-full shadow">❯</button>
+
+    <!-- Dot Indicators -->
+    <div id="dotContainer" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      <!-- Dots added by JS -->
+    </div>
+  </div>
+  <!-- Selected Pattern Name -->
+  <h3 id="selectedPatternName" class="text-xl font-semibold text-pink-700">
+    {{ patterns.0.name }}
+  </h3>
+  <p id="selectedPatternDescription" class="text-sm text-gray-500 mb-4">{{ patterns.0.description }}</p>
+</div>
+
+<div>
+  <!-- Pattern Thumbnails Scroll -->
+  <div class="flex overflow-x-auto space-x-6 pb-4 mb-6 scroll-smooth snap-x">
+    {% for pattern in patterns %}
+    <div class="flex-shrink-0 text-center w-48 snap-start pattern-item bg-white p-2"
+      data-pattern-id="{{ pattern.id }}">
+      <img
+        src="{{ pattern.images.first.image.url }}"
+        class="pattern-thumbnail aspect-[15/10] object-cover rounded-lg cursor-pointer border-4 border-transparent hover:border-pink-500 mx-auto"
+        data-pattern-index="{{ forloop.counter0 }}"
+        alt="{{ pattern.name }}">
+      <h4 class="mt-2 text-sm font-semibold">{{ pattern.name }}</h4>
+      <p class="text-xs text-gray-500">{{ pattern.description|truncatewords:3 }}</p>
+
+            <div class="">
+              <span class="text-xs font-bold text-gary-800">
+                  ₹{{ pattern.price|floatformat:2 }}
+              </span>
+              {% if pattern.original_price %}
+                  <span class="text-xs line-through text-gray-500 ml-2">
+                      ₹{{ pattern.original_price|floatformat:2 }}
+                  </span>
+              {% endif %}
+
+              <span class="text-xs text-gray-500"> Includes Stitching</span>
+          </div>
+
+              <div class="flex items-center justify-center space-x-1 mt-1 shrink-0">
+              {% with rating=pattern.average_rating|default:0 %}
+                {% if rating > 0 %}
+                  {% for i in "12345" %}
+                    {% with star_num=forloop.counter %}
+                      <svg class="w-4 h-4 {% if star_num <= rating %}text-gray-600{% else %}text-gray-300{% endif %}" 
+                          fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 1l2.39 5.99H18l-4.9 4.12 1.82 6.01L10 13.77l-4.92 3.35L6.9 11.1 2 6.99h5.61z" />
+                      </svg>
+                    {% endwith %}
+                  {% endfor %}
+                  <span class="text-xs text-gray-600 ml-1">{{ rating|floatformat:1 }}/5</span>
+                  <p class="text-xs text-gray-600">({{pattern.total_reviews}})</p>
+                {% else %}
+                <div class="text-xs text-gray-400 italic text-center w-full"> Start the trend – rate it! </div>
+                {% endif %}
+              {% endwith %}
+              </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+      <div>
+      <div id="similar-products-heading"> </div>
+      <div id="similar-products" class="flex overflow-x-auto space-x-6 pb-4 mb-6 scroll-smooth snap-x"></div>
+    </div>
+
+</div>
+</div>
+  <!-- Next Button Form -->
+  <form id="patternForm" method="post" action="{% url 'select-style' %}" class="text-center mt-6">
+    {% csrf_token %}
+    <input type="hidden" name="pattern_id" id="selectedPatternId" value="{{ patterns.0.id }}">
+    <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-8 rounded-xl">
+      Next: Enter Measurements →
+    </button>
+  </form>
+
+  <!-- JavaScript Section -->
+  <script>
+    const patterns = [
+      {% for pattern in patterns %}
+      {
+        id: {{ pattern.id }},
+        name: "{{ pattern.name|escapejs }}",
+        description: "{{ pattern.description|truncatewords:20|escapejs }}",
+        images: [
+          {% for img in pattern.images.all %}
+            "{{ img.image.url }}",
+          {% endfor %}
+        ]
+      },
+      {% endfor %}
+    ];
+    
+    // Inject from Django context
+    const selectedPatternIdFromSession = {{ selected_pattern_id|default:'null' }};
+
+    let currentPatternIndex = 0;
+    if (selectedPatternIdFromSession) {
+      const foundIndex = patterns.findIndex(p => p.id === selectedPatternIdFromSession);
+      if (foundIndex !== -1) {
+        currentPatternIndex = foundIndex;
+      }
+    }
+
+    let currentImageIndex = 0;
+    const mainImage = document.getElementById("mainImage");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const dotContainer = document.getElementById("dotContainer");
+    const selectedPatternName = document.getElementById("selectedPatternName");
+    const selectedPatternDescription = document.getElementById("selectedPatternDescription");
+    const selectedPatternIdInput = document.getElementById("selectedPatternId");
+
+    function updateMainImage() {
+      const pattern = patterns[currentPatternIndex];
+      mainImage.src = pattern.images[currentImageIndex];
+      updateDots();
+      selectedPatternName.textContent = pattern.name;
+      selectedPatternDescription.textContent = pattern.description;
+      selectedPatternIdInput.value = pattern.id;
+      highlightSelectedThumbnail();
+    }
+
+    function highlightSelectedThumbnail() {
+      const thumbnails = document.querySelectorAll(".pattern-thumbnail");
+      thumbnails.forEach((thumb, index) => {
+        if (index === currentPatternIndex) {
+          thumb.classList.add("border-pink-600");
+          thumb.classList.remove("border-transparent");
+        } else {
+          thumb.classList.remove("border-pink-600");
+          thumb.classList.add("border-transparent");
+        }
+      });
+    }
+
+    // Swipe Gesture Support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    mainImage.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    mainImage.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleGesture();
+    });
+
+    function handleGesture() {
+      const delta = touchEndX - touchStartX;
+      if (Math.abs(delta) > 50) {
+        const images = patterns[currentPatternIndex].images;
+        if (delta < 0) {
+          currentImageIndex = (currentImageIndex + 1) % images.length;
+        } else {
+          currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+        }
+        updateMainImage();
+      }
+    }
+
+    function updateDots() {
+      const pattern = patterns[currentPatternIndex];
+      dotContainer.innerHTML = "";
+      pattern.images.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = `h-3 w-3 rounded-full ${index === currentImageIndex ? 'bg-pink-600' : 'bg-gray-300'} inline-block`;
+        dotContainer.appendChild(dot);
+      });
+    }
+
+    prevBtn.addEventListener("click", () => {
+      const images = patterns[currentPatternIndex].images;
+      currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+      updateMainImage();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      const images = patterns[currentPatternIndex].images;
+      currentImageIndex = (currentImageIndex + 1) % images.length;
+      updateMainImage();
+    });
+
+    document.querySelectorAll("[data-pattern-index]").forEach(thumb => {
+      thumb.addEventListener("click", () => {
+        currentPatternIndex = parseInt(thumb.dataset.patternIndex);
+        currentImageIndex = 0;
+        updateMainImage();
+      });
+    });
+
+    updateMainImage();
+
+
+
+
+
+
+
+
+
+
+    
+
+let modal = document.getElementById('productModal');
+let modalImage = document.getElementById('modalImage');
+let productDetailLink = document.getElementById('productDetailLink');
+let closeModal = document.getElementById('closeModal');
+let nextBtn2 = document.getElementById('nextBtn2');
+let prevBtn2 = document.getElementById('prevBtn2');
+
+let currentImageIndex2 = 0;
+let currentImages = [];
+
+function openModal(images, productId) {
+  currentImages = images;
+  currentImageIndex2 = 0;
+  modalImage.src = currentImages[0];
+  productDetailLink.href = `/${productId}/product-detail`;
+  modal.classList.remove('hidden');
+}
+
+closeModal.addEventListener('click', () => modal.classList.add('hidden'));
+
+nextBtn2.addEventListener('click', () => {
+  currentImageIndex2 = (currentImageIndex2 + 1) % currentImages.length;
+  modalImage.src = currentImages[currentImageIndex2];
+});
+
+prevBtn2.addEventListener('click', () => {
+  currentImageIndex2 = (currentImageIndex2 - 1 + currentImages.length) % currentImages.length;
+  modalImage.src = currentImages[currentImageIndex2];
+});
+
+
+
+
+    
+
+    // Get simillar Products 
+
+    // Get all clickable fabric items
+const patternItems = document.querySelectorAll('.pattern-item');
+
+// Where to show similar products
+const similarProductsDiv = document.getElementById('similar-products');
+const similarProductsHeadingDiv = document.getElementById('similar-products-heading')
+patternItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const patternId = item.dataset.patternId;
+
+    // Optionally highlight selected
+    // patternItems.forEach(el => el.classList.remove('ring-2', 'ring-pink-500'));
+    // item.classList.add('ring-2', 'ring-pink-500');
+
+    // Fetch similar products
+    fetch(`/get-similar-products-pattern/?pattern_id=${patternId}`)
+      .then(response => response.json())
+      .then(data => {
+        similarProductsDiv.innerHTML = ''; // clear previous results
+        similarProductsHeadingDiv.innerHTML = '';
+
+        if (data.products.length === 0) {
+          similarProductsDiv.innerHTML = `
+            <p class="text-gray-500">No similar products found.</p>
+          `;
+          return;
+        } else {
+          similarProductsHeadingDiv.innerHTML = `
+            <h2 class="text-xl font-bold mt-8 mb-4">Crafted in Similar Style</h2>
+          `;
+        }
+
+
+    data.products.forEach(product => {
+      const productCard = document.createElement('div');
+      productCard.className = 'bg-white rounded text-center hover:shadow cursor-pointer';
+
+      productCard.innerHTML = `
+        <img src="${product.images[0]}" alt="${product.name}" class="w-full h-40 object-cover rounded">
+        <p class="font-medium">${product.name}</p>
+      `;
+
+      productCard.addEventListener('click', () => {
+        openModal(product.images, product.id);
+      });
+
+      similarProductsDiv.appendChild(productCard);
+    });
+      })
+      .catch(error => {
+        console.error('Error fetching similar products:', error);
+      });
+  });
+});
+
+  </script>
+</div>
+{% endblock %}

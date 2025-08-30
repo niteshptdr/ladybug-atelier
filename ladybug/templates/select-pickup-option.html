@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto py-8 px-4 min-h-screen">
+
+        <div class="bg-pink-50 border border-pink-200 rounded-xl p-4 shadow-sm mb-6">
+          <div>
+
+        <a href="{% url 'select-fabric-option' %}" class="inline-flex items-center text-md text-pink-600 font-medium hover:underline">
+
+              ← Back
+            </a>
+          </div>
+      </div>
+
+
+  <h2 class="text-lg font-bold text-center mb-2"> How Would You Like to Send Your Fabric? </h2>
+  <hr class="mb-6">
+
+  <form id="categoryForm" method="post" action="{% url 'select-pickup-option' %}" class="flex justify-center">
+    {% csrf_token %}
+    
+    <div class="flex gap-6 w-full max-w-xl">
+      
+      <div class="flex flex-col items-center text-center">
+        <button type="submit" name="category_id" value="pickup">
+          
+          <div class="">
+              <img
+                src="{{pickup_thumbnails.image.url}}"
+                class=" w-full aspect-[4/3] category-thumbnail object-cover rounded-xl cursor-pointer border-2 border-gray-400 hover:border-pink-500 transition duration-200 ease-in-out"
+                data-option="pickup"
+                alt="pickup">
+            </div>
+        </button>
+        <h4 class="mt-3 text-base font-semibold">We’ll Arrange Pickup</h4>
+        <p class="text-xm text-gray-500">Choose this if you’d like us to coordinate a pickup from your location
+            (<span class="font-semibold text-gray-700">Pickup charges: Rs. 100</span>).
+        </p>
+      </div>
+      
+      
+      <div class="flex flex-col items-center text-center">
+        <button type="submit" name="category_id" value="send">
+          
+          <div class="">
+              <img
+                src="{{drop_thumbnails.image.url}}"
+                class=" w-full aspect-[4/3] category-thumbnail object-cover rounded-xl cursor-pointer border-2 border-gray-400 hover:border-pink-500 transition duration-200 ease-in-out"
+                data-option="drop"
+                alt="select_fabric">
+            </div>
+        </button>
+        <h4 class="mt-3 text-base font-semibold">Send It Yourself</h4>
+        <p class="text-xm text-gray-500"> You can send your fabric to our address after placing the order. </p>
+      </div>
+      
+    </div>
+
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const selectedOption = "{{ selected_pickup_option|default:'' }}";
+    if (!selectedOption) return;
+
+    const thumbnails = document.querySelectorAll('.category-thumbnail');
+    thumbnails.forEach(img => {
+      if (img.dataset.option === selectedOption) {
+        img.classList.remove('border-gray-400');
+        img.classList.add('border-pink-500');
+      }
+    });
+  });
+</script>
+
+
+
+{% endblock %}

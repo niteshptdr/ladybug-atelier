@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="flex justify-center w-[80%] mx-auto">
+  <div class="w-full">
+    <h2 class="flex justify-center text-xl font-semibold mb-4 mt-2">Shipping Address</h2>
+
+    <form method="POST" class="space-y-4">
+      {% csrf_token %}
+      {% for field in form %}
+        <div>
+          <label class="block font-medium mb-1">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <p class="text-red-500 text-sm">{{ field.errors }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="flex justify-center ">
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded mb-4">Save & Continue</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+
+
+  <!-- Success or error message display -->
+  {% if messages %}
+    <div class="mt-4 fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+      {% for message in messages %}
+        <div class="message-container text-sm px-3 py-2 mb-2 rounded border transition-opacity duration-500 ease-in-out
+          {% if 'error' in message.tags %}
+            text-red-700 bg-red-100 border-red-300
+          {% elif 'success' in message.tags %}
+            text-green-700 bg-green-100 border-green-300
+          {% elif 'warning' in message.tags %}
+            text-yellow-700 bg-yellow-100 border-yellow-300
+          {% else %}
+            text-blue-700 bg-blue-100 border-blue-300
+          {% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const messages = document.querySelectorAll('.message-container');
+    messages.forEach(msg => {
+      setTimeout(() => {
+        msg.classList.add('opacity-0');
+        setTimeout(() => msg.remove(), 500); // remove after fade-out
+      }, 4000); // display for 2 seconds
+    });
+  });
+  </script>
+
+
+  {% endblock content %}

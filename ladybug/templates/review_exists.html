@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+
+
+  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center border border-gray-200">
+      <img src="{% static 'images/Ladybug_trns.png' %}" alt="Logo" class="h-20 sm:h-20 ms-4 rounded p-0 {% block logo_bg %}{% endblock %}">
+
+
+    <!-- Animated Check Icon -->
+    <div class="mx-auto mb-4">
+      <svg class="w-16 h-16 text-green-500 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+
+    <!-- Thank You Message -->
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Feedback has already been received for this purchase!</h2>
+    <p class="text-gray-600 mb-6"></p>
+
+    <!-- Optional CTA -->
+    <a href="{% url 'home' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-full shadow transition">
+      Shop More
+    </a>
+  </div>
+</div>
+
+{% endblock content %}

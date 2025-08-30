@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto py-8 px-4 min-h-screen">
+
+        <div class="bg-white border border-pink-200 rounded-xl p-4 shadow-sm mb-6">
+          <div>
+            <a href="{% url 'select-category' %}" class="inline-flex items-center text-md text-pink-600 font-medium hover:text-pink-700">
+              <i class="fas fa-arrow-left me-2"></i>
+                Back
+            </a>
+          </div>
+      </div>
+
+
+  <h2 class="text-lg font-bold text-center mb-2"> Would you like to use your own fabric or purchase one from us? </h2>
+  <hr class="mb-6">
+
+  <form id="categoryForm" method="post" action="{% url 'select-fabric-option' %}" class="flex justify-center">
+    {% csrf_token %}
+    
+    <div class="flex gap-6 w-full max-w-xl">
+      
+      <div class="flex flex-col items-center text-center">
+        <button type="submit" name="category_id" value="own_fabric">
+          
+          <div class="">
+              <img
+                src="{{own_thumbnails.image.url}}"
+                class=" w-full aspect-[4/3] category-thumbnail object-cover rounded-xl cursor-pointer border-2 border-gray-400 hover:border-pink-500 transition duration-200 ease-in-out"
+                data-option="own_fabric"
+                alt="own_fabric">
+            </div>
+        </button>
+        <h4 class="mt-3 text-base font-semibold">Your Own Fabric</h4>
+        <p class="text-xs text-gray-500">We can arrange door-step pickup of your fabric or you can send your fabric to our address.</p>
+      </div>
+      
+      
+      <div class="flex flex-col items-center text-center">
+        <button type="submit" name="category_id" value="select_fabric">
+          
+          <div class="">
+              <img
+                src="{{purchase_thumbnails.image.url}}"
+                class="w-full aspect-[4/3] category-thumbnail object-cover rounded-xl cursor-pointer border-2 border-gray-400 hover:border-pink-500 transition duration-200 ease-in-out"
+                data-option="purchase_fabric"
+                alt="select_fabric">
+            </div>
+        </button>
+        <h4 class="mt-3 text-base font-semibold">Purchase Fabric from Us</h4>
+        <p class="text-xs text-gray-500">Browse and select from our curated collection of high-quality fabrics. </p>
+      </div>
+      
+    </div>
+
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const selected_fabric_option = "{{ selected_fabric_option|default:'' }}";
+    if (!selected_fabric_option) return;
+
+    const thumbnails = document.querySelectorAll('.category-thumbnail');
+    thumbnails.forEach(img => {
+
+      if (img.dataset.option === selected_fabric_option) {
+        img.classList.remove('border-gray-400');
+        img.classList.add('border-pink-500');
+      }
+    });
+  });
+</script>
+
+
+
+{% endblock %}

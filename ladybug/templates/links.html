@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<!-- Page wrapper -->
+<div class="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
+
+  <!-- Card -->
+  <div class="w-full max-w-md rounded-3xl shadow-xl backdrop-blur-sm bg-gradient-to-b from-[#cf1d5e] to-[#fcd3a4]">
+    
+    <!-- Header / Brand -->
+    <div class="px-6 pt-8 pb-6 text-center">
+      <!-- <img
+        src="{% static 'images/Ladybug_trns.png' %}"
+        alt="Ladybug Atelier logo"
+        class="mx-auto h-16 w-16 rounded-2xl shadow-sm"
+      /> -->
+      <h1 class="mt-4 text-4xl font-bold tracking-tight text-gray-100">Ladybug Atelier</h1>
+      <p class="mt-1 text-sm text-gray-100">Where Every Stitch is Just for You</p>
+    </div>
+
+    <!-- Links -->
+    <div class="px-4 pb-6">
+      <div class="grid gap-3">
+
+        <!-- Website -->
+        <a
+          href="https://ladybugatelier.com"
+          target="_blank" rel="noopener"
+          class="group flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-5 py-4 shadow-sm ring-1 ring-black/0 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/20 active:translate-y-0"
+          aria-label="Open website home page"
+        >
+          <div class="flex items-center gap-3 ms-6">
+            <i class="fa-solid fa-globe text-xl text-pink-600 transition group-hover:text-pink-600"></i>
+            <div class="text-left">
+              <span class="block text-base font-medium">Website</span>
+              <span class="block text-xs text-neutral-500">ladybugatelier.com</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-sm text-neutral-400 group-hover:text-neutral-600"></i>
+        </a>
+
+        <!-- Google Location -->
+        <a
+          href="https://maps.app.goo.gl/y9L2k37H28Tq6wh78?g_st=ipc"
+          target="_blank" rel="noopener"
+          class="group flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-5 py-4 shadow-sm ring-1 ring-black/0 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/20 active:translate-y-0"
+          aria-label="Open Google Maps location"
+        >
+          <div class="flex items-center gap-3 ms-6">
+            <i class="fa-solid fa-location-dot text-xl text-pink-600 transition group-hover:text-pink-600"></i>
+            <div class="text-left">
+              <span class="block text-base font-medium">Location</span>
+              <span class="block text-xs text-neutral-500">Get directions</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-sm text-neutral-400 group-hover:text-neutral-600"></i>
+        </a>
+
+        <!-- Instagram -->
+        <a
+          href="https://www.instagram.com/ladybug_atelier_by_deesha?igsh=b3hpY2JoaXh1bGNh&utm_source=qr"
+          target="_blank" rel="noopener"
+          class="group flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-5 py-4 shadow-sm ring-1 ring-black/0 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/20 active:translate-y-0"
+          aria-label="Open Instagram profile"
+        >
+          <div class="flex items-center gap-3 ms-6">
+            <i class="fa-brands fa-instagram text-xl text-pink-600 transition group-hover:text-pink-600"></i>
+            <div class="text-left">
+              <span class="block text-base font-medium">Instagram</span>
+              <span class="block text-xs text-neutral-500">@ladybug_atelier_by_deesha</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-sm text-neutral-400 group-hover:text-neutral-600"></i>
+        </a>
+
+        <!-- Facebook -->
+        <a
+          href="https://www.facebook.com/profile.php?id=61576119304083"
+          target="_blank" rel="noopener"
+          class="group flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-5 py-4 shadow-sm ring-1 ring-black/0 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-800/20 active:translate-y-0"
+          aria-label="Open Facebook page"
+        >
+          <div class="flex items-center gap-3 ms-6">
+            <i class="fa-brands fa-facebook-f text-xl text-pink-600 transition group-hover:text-pink-600"></i>
+            <div class="text-left">
+              <span class="block text-base font-medium">Facebook</span>
+              <span class="block text-xs text-neutral-500">@Ladybug Atelier</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square text-sm text-neutral-400 group-hover:text-neutral-600"></i>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- Footer / Short URL -->
+    <!-- <div class="px-6 pb-6 text-center">
+      <p class="text-xs text-neutral-500">
+        
+        <span class="font-mono">https://ladybugatelier.com</span>
+      </p>
+    </div> -->
+  </div>
+</div>
+
+{% endblock %}

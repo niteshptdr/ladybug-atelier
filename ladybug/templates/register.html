@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    
+</head>
+
+<div class="flex justify-center py-10 min-h-screen">
+    <div class="bg-white/90 shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Register</h1>
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+
+            <div>
+                <label for="name" class="block text-gray-700 font-medium mb-2">Name</label>
+                <input id="name" name="name" type="text" class="w-full border-2 border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" required />
+            </div>
+
+            <div>
+                <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                <input id="email" name="email" type="email" class="w-full border-2 border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" placeholder="xxx.@gmail.com" required />
+            </div>
+
+            <div>
+                <label for="mobile" class="block text-gray-700 font-medium mb-2">Mobile Number</label>
+                <div class="flex rounded-md shadow-sm">
+                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-600 text-sm">
+                    +91
+                    </span>
+                    <input
+                    id="mobile"
+                    name="mobile"
+                    type="text"
+                    maxlength="10"
+                    pattern="\d{10}"
+                    class="w-full border-2 border-gray-300 rounded-r-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
+                    placeholder="10-digit mobile number"
+                    required
+                    />
+                </div>
+            </div>
+            
+        <div>
+        <label class="block text-gray-700 font-medium mb-2">Delivery Address</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input name="house" type="text" class="border-2 border-gray-300 rounded-md px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="House No." required />
+                <input name="building" type="text" class="border-2 border-gray-300 rounded-md px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Building" required />
+                <input name="colony" type="text" class="border-2 border-gray-300 rounded-md px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Colony / Locality" required />
+                <input name="city" type="text" class="border-2 border-gray-300 rounded-md px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="City" required />
+                <input name="state" type="text" class="border-2 border-gray-300 rounded-md px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="State" required />
+                <input name="pincode" type="text" maxlength="6" pattern="\d{6}" class="border-2 border-gray-300 rounded-md px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="PIN Code" required />
+            </div>
+        </div>
+
+                <button type="submit" class="w-full inline-block px-10 py-3 text-md font-medium text-white border-2 border-gray-200 rounded-full bg-pink-600 transition-colors duration-500 ease-in-out hover:bg-cyan-600 hover:text-white focus:outline-none">
+                    Register
+                </button>
+            <!-- <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-md font-medium hover:bg-blue-700 transition">
+                Register
+            </button> -->
+            <p class="text-center mt-4 text-gray-600">
+                Already have an account? <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Login</a>
+            </p>
+        </form>
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div 
+                        class="py-2 px-4 rounded-lg my-2 
+                            {% if message.tags == 'error' %}bg-red-500 text-white{% endif %} 
+                            {% if message.tags == 'success' %}bg-green-500 text-white{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+</html>
+{% endblock content %}

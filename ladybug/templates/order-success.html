@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<h2 class="flex justify-center text-xl font-semibold mb-4 mt-4"> Review Order </h2>
+
+<div class="bg-yellow-50 shadow rounded-lg p-4 ms-6 me-6 mx-auto mt-6">
+  <h2 class="text-lg font-semibold mb-4 text-gray-800"> Shipping Address </h2>
+  
+  <div class="text-gray-700 mb-4">
+    <p><span class="font-medium"> </span> {{ profile.house }}, {{ profile.building }}, {{ profile.street }}</p>
+
+    <p><span class="font-medium"> </span> {{ profile.area }}, {{ profile.city }}, {{ profile.state }}</p>
+    <p><span class="font-medium">Pin Code:</span> {{ profile.zip_code }}</p>
+    <p><span class="font-medium">Mobile:</span> {{ profile.mobile }}</p>
+  </div>
+
+  <div class="mt-4 text-right">
+    <a href="{% url 'address' %}" class="text-blue-600 hover:underline">Edit Address</a>
+  </div>
+</div>
+
+<div class="border rounded-lg p-4 ms-6 me-6 mx-auto mt-6 mb-6 shadow bg-white">
+
+  <div class="divide-y">
+    
+      <div class="py-3 flex gap-4 items-start">
+        {% if cart_item.product %}
+          <img src="{{ cart_item.product.images.first.image.url }}" alt="Product" 
+                      class="w-20 h-20 object-cover rounded border cursor-pointer hover:scale-105 transition"
+                      onclick="openImageModal('{{ cart_item.product.images.first.image.url }}')">
+        {% else %}
+          <img src="{{ cart_item.fabric.images.first.image.url }}" alt="Fabric"             
+            class="w-20 h-20 object-cover rounded border cursor-pointer hover:scale-105 transition"
+            onclick="openImageModal('{{ cart_item.fabric.images.first.image.url }}')">
+          <img src="{{ cart_item.pattern.images.first.image.url }}" alt="Pattern" 
+            class="w-20 h-20 object-cover rounded border cursor-pointer hover:scale-105 transition"
+            onclick="openImageModal('{{ cart_item.pattern.images.first.image.url }}')">
+        {% endif %}
+
+        <div class="flex-1 text-sm">
+          {% if cart_item.product %}
+            <p class="font-medium">{{ cart_item.product.name }}</p>
+            <p class="text-gray-500">{{ cart_item.product.description|truncatechars:100 }}</p>
+          {% else %}
+            <p class="font-medium text-pink-600">Custom Design</p>
+            <p class="text-gray-500">Fabric: {{ cart_item.fabric.name }} | Pattern: {{ cart_item.pattern.name }}</p>
+          {% endif %}
+
+          <p class="mt-1">Quantity: {{ cart_item.quantity }}</p>
+
+          {% if cart_item.measurements %}
+            <p class="text-xs text-gray-500 font-medium">Measurements:</p>
+            <ul class="text-xs text-gray-600 list-disc ml-5">
+              {% for key, value in cart_item.measurements.items %}
+                <li>{{ key }}: {{ value }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          {% if cart_item.options %}
+            <p class="text-xs text-gray-500 font-medium">Preferences:</p>
+            <ul class="text-xs text-gray-600 list-disc ml-5">
+              {% for key, value in item.options.items %}
+                <li>{{ key }}: {{ value }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+        </div>
+      </div>
+
+  </div>
+
+  <div class="mt-3 text-right text-sm">
+    <p><strong>Price:</strong> ₹{{ total_price }}</p>
+    <p class="text-gray-500">Expected delivery: Ships in 2 Days</p>
+  </div>
+
+    <div class="mt-8 text-center">
+      <form action="{% url 'order-review' %}" method="post">
+        {% csrf_token %}
+        <button type='submit'  class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-6 rounded-xl mb-4">CONTINUE</button>
+      </form>
+      <br>
+      <a href="{% url 'cart' %}" class="text-blue-600 hover:underline">Go Back</a>
+    </div>
+
+
+</div>
+
+
+  <!-- Success or error message display -->
+  {% if messages %}
+    <div class="mt-4 fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+      {% for message in messages %}
+        <div class="message-container text-sm px-3 py-2 mb-2 rounded border transition-opacity duration-500 ease-in-out
+          {% if 'error' in message.tags %}
+            text-red-700 bg-red-100 border-red-300
+          {% elif 'success' in message.tags %}
+            text-green-700 bg-green-100 border-green-300
+          {% elif 'warning' in message.tags %}
+            text-yellow-700 bg-yellow-100 border-yellow-300
+          {% else %}
+            text-blue-700 bg-blue-100 border-blue-300
+          {% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const messages = document.querySelectorAll('.message-container');
+    messages.forEach(msg => {
+      setTimeout(() => {
+        msg.classList.add('opacity-0');
+        setTimeout(() => msg.remove(), 500); // remove after fade-out
+      }, 4000); // display for 2 seconds
+    });
+  });
+</script>
+
+
+{% endblock content %}
