@@ -1496,9 +1496,10 @@ def admin_create_order(request):
 
                 order.total_amount = grand_total
                 order.save()
-
+                
                 send_order_confirmation(order)
                 messages.success(request, f"Order #{order.id} created successfully ✅")
+                return redirect("admin_order_invoice", order_id=order.id)
             else:
                 messages.error(request, "Please correct the errors in the form.")
         except Exception as e:
@@ -1522,6 +1523,40 @@ def admin_create_order(request):
         "pattern_options": pattern_options,
     })
 
+@staff_member_required
+def admin_order_invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    items = order.items.all()
+
+    # prepare invoice items with calculated line totals
+    invoice_items = []
+    for item in items:
+        if item.product and item.product.price:
+            unit_price = item.product.price
+        elif item.custom_price:
+            unit_price = item.custom_price
+        else:
+            unit_price = 0
+
+        line_total = unit_price * item.quantity
+
+        invoice_items.append({
+            "name": (
+                item.product.name if item.product
+                else item.custom_pattern_name if item.custom_pattern
+                else item.pattern.name if item.pattern
+                else "Custom Item"
+            ),
+            "quantity": item.quantity,
+            "unit_price": unit_price,
+            "line_total": line_total,
+        })
+
+    context = {
+        "order": order,
+        "invoice_items": invoice_items,
+    }
+    return render(request, "admin_order_invoice.html", context)
 
 
 # --- ADD THIS VIEW ---
@@ -1570,8 +1605,7 @@ def lookup_customer_by_mobile(request):
     }
     return JsonResponse(data)
 
-
-
 def LinksView(request):
    
    return render(request, 'links.html', {})
+

@@ -37,6 +37,8 @@ urlpatterns = [
 
     path('manual-order', views.admin_create_order, name='admin-create-order'),
     path('manual-order/lookup-customer/', views.lookup_customer_by_mobile, name='lookup-customer'),
+    path("<int:order_id>/invoice/", views.admin_order_invoice, name="admin_order_invoice"),
+
 
     path("links/", views.LinksView, name="links"),  # <-- name added
 
