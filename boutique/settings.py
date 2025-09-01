@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     'ladybug-8vnk.onrender.com',
     'ladybug-atelier.onrender.com',
     'ladybugatelier.com',
+    'https://ladybug-atelier-dev.onrender.com'
     ]
 
 
