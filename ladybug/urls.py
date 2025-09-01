@@ -41,5 +41,6 @@ urlpatterns = [
 
 
     path("links/", views.LinksView, name="links"),  # <-- name added
+    path("dev/", views.dev, name="dev"),  # <-- name added
 
 ]

@@ -1609,3 +1609,8 @@ def LinksView(request):
    
    return render(request, 'links.html', {})
 
+
+def dev(request):
+   
+   return render(request, 'dev.html', {})
+
