@@ -32,7 +32,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     '192.168.1.9',
     '127.0.0.1',
-    '216.24.57.1'
+    '216.24.57.1',
     'ladybug-8vnk.onrender.com',
     'ladybug-atelier.onrender.com',
     'ladybugatelier.com',
