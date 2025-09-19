@@ -254,4 +254,6 @@ class BaseItemFS(BaseInlineFormSet):
 
 AdminOrderItemFormSet = inlineformset_factory(
     Order, OrderItem, form=AdminOrderItemForm, formset=BaseItemFS, extra=1, can_delete=True
-)
+        )
+
+

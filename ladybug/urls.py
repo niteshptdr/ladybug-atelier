@@ -4,6 +4,7 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('', views.home, name='home'),
+    # path('', views.LinksView, name='links'),
     path('select-category', views.select_category, name='select-category'),
     path('select-fabric-option', views.select_fabric_option, name='select-fabric-option'),
     path('select-pickup-option', views.select_pickup_option, name='select-pickup-option'),

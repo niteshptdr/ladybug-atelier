@@ -2,7 +2,6 @@
 {% block content %}
 
 
-
 {% if messages %}
   <div class="space-y-2">
     {% for message in messages %}
@@ -15,8 +14,6 @@
     {% endfor %}
   </div>
 {% endif %}
-
-
 
 
 <div class="max-w-4xl mx-auto p-6 space-y-6">
@@ -64,7 +61,8 @@
         <div>{{ cust_form.email.label_tag }} {{ cust_form.email }}</div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+      <div class="grid grid-cols-3 sm:grid-cols-3 gap-1 text-xs">
         <div>{{ cust_form.building.label_tag }} {{ cust_form.building }}</div>
         <div>{{ cust_form.house.label_tag }} {{ cust_form.house }}</div>
         <div>{{ cust_form.street.label_tag }} {{ cust_form.street }}</div>

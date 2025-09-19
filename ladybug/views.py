@@ -65,44 +65,48 @@ def calculate_final_price(base_price, original_price=None, flat_discount=None):
     }
 
 
-def home(request):
-    images = CarouselImage.objects.all()
-    categories = Category.objects.all()
-    create_style_card = cardImages.objects.get(name = 'create_style_card')
+# def home(request):
+#     images = CarouselImage.objects.all()
+#     categories = Category.objects.all()
+#     create_style_card = cardImages.objects.get(name = 'create_style_card')
 
-    products = Product.objects.annotate(
-        average_rating=Avg('productreview__rating', filter=Q(productreview__is_submitted=True)),
-        total_reviews=Count('productreview', filter=Q(productreview__is_submitted=True))).all()
+#     products = Product.objects.annotate(
+#         average_rating=Avg('productreview__rating', filter=Q(productreview__is_submitted=True)),
+#         total_reviews=Count('productreview', filter=Q(productreview__is_submitted=True))).all()
 
-    products_by_view = products.order_by('-views')[0:3]
-    products_by_date = products.order_by('-created_at').exclude(id__in=products_by_view.values_list('id', flat=True))
+#     products_by_view = products.order_by('-views')[0:3]
+#     products_by_date = products.order_by('-created_at').exclude(id__in=products_by_view.values_list('id', flat=True))
 
-    flat_discount = FlatDiscount.objects.filter(is_active=True).first()
+#     flat_discount = FlatDiscount.objects.filter(is_active=True).first()
 
-    for product in products_by_view:
-        pricing = calculate_final_price(
-            base_price=product.price,
-            original_price=product.original_price,
-            flat_discount=flat_discount
-        )
-        product.final_price = pricing['final_price']
-        product.original_price = pricing['original_price']
+#     for product in products_by_view:
+#         pricing = calculate_final_price(
+#             base_price=product.price,
+#             original_price=product.original_price,
+#             flat_discount=flat_discount
+#         )
+#         product.final_price = pricing['final_price']
+#         product.original_price = pricing['original_price']
 
-    for product in products_by_date:
-        pricing = calculate_final_price(
-            base_price=product.price,
-            original_price=product.original_price,
-            flat_discount=flat_discount
-        )
-        product.final_price = pricing['final_price']
-        product.original_price = pricing['original_price']
+#     for product in products_by_date:
+#         pricing = calculate_final_price(
+#             base_price=product.price,
+#             original_price=product.original_price,
+#             flat_discount=flat_discount
+#         )
+#         product.final_price = pricing['final_price']
+#         product.original_price = pricing['original_price']
     
 
-    return render(request, 'home.html', {'carousel_images': images,
-                                         'categories': categories,
-                                         'create_style_card': create_style_card,
-                                         'products_by_view': products_by_view,
-                                         'products_by_date': products_by_date})
+#     return render(request, 'home.html', {'carousel_images': images,
+#                                          'categories': categories,
+#                                          'create_style_card': create_style_card,
+#                                          'products_by_view': products_by_view,
+#                                          'products_by_date': products_by_date})
+
+def home(request):
+
+    return render(request, 'links.html', {})
 
 
 # REGISTER

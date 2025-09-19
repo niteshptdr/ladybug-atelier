@@ -148,56 +148,56 @@
 
             <!-- Logo Section -->
             <a href="{% url 'home' %}" class="flex items-center justify-start sm:justify-start ms-2">
-            <img src="{% static 'images/Ladybug_trns.png' %}" alt="Logo" class="h-15 sm:h-15 ms-4 rounded p-0 {% block logo_bg %}{% endblock %}">
+            <img src="{% static 'images/Ladybug_trns.png' %}" alt="Logo" class="h-10 sm:h-10 ms-4 rounded p-2 {% block logo_bg %}{% endblock %}">
             </a>
 
             <!-- Navigation Links (Desktop) -->
             <ul class="hidden lg:flex space-x-4 text-slate-700 ms-4">
-                <li><a href="{% url 'home' %}" class="hover:text-rose-800 font-semibold transition duration-300 ease-in-out"> <i class="fas fa-home mr-2"></i> Home</a></li>
+                <!-- <li><a href="{% url 'home' %}" class="hover:text-rose-800 font-semibold transition duration-300 ease-in-out"> <i class="fas fa-home mr-2"></i> Home</a></li> -->
 
-                    {% if user.is_authenticated %}
-                    {% with user.profile as profile %}
+                    <!-- {% if user.is_authenticated %}
+                    {% with user.profile as profile %} -->
 
                     <!-- <li>
                         <a href="" class="hover:text-rose-800 font-semibold transition duration-300 ease-in-out">
                             | {{ profile.name }}
                         </a>
                     </li> -->
-                    <li class="relative">
-                        <!-- Profile Button -->
+                    <!-- <li class="relative">
+                        
                         <button id="desktop-account-toggle" class="hover:text-rose-800 focus:outline-none">
                             <i class="fas fa-user mr-2"></i> {{ profile.name }}
                             <i class="fas fa-chevron-down ml-1 transition-transform duration-300" id="desktop-account-chevron"></i>
                         </button>
 
-                        <!-- Floating dropdown menu -->
+                        
                         <ul id="desktop-account-submenu" class="hidden absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md border z-50 text-sm transition-all duration-300 py-2">
                             <li><a href="{% url 'cart' %}" class="block px-4 py-2 hover:bg-rose-100 hover:text-rose-800"><i class="fas fa-shopping-cart mr-2"></i>Cart</a></li>
                             <li><a href="{% url 'orders' %}" class="block px-4 py-2 hover:bg-rose-100 hover:text-rose-800"><i class="fas fa-box mr-2"></i>Orders</a></li>
                             <li><a href="{% url 'logout' %}" class="block px-4 py-2 hover:bg-rose-100 hover:text-rose-800"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a></li>
                         </ul>
-                    </li>
+                    </li> -->
 
-                    {% endwith %}
+                    <!-- {% endwith %} -->
 
-                        <li class="block">
+                        <!-- <li class="block">
                             
                         {% else %}
                             <a href="{% url 'login' %}" class="hover:text-rose-800 font-semibold"> <i class="fas fa-sign-in-alt mr-2"></i>Login</a>
                         {% endif %}
-                        </li>
+                        </li> -->
 
             </ul>
         </div>
         <!-- Mobile Menu Links -->
         <ul id="mobile-menu" class="hidden bg-white text-slate-800 shadow-sm font-semibold p-4 space-y-2 lg:hidden w-auto text-left fixed left-2 z-50 transition-all duration-300 ease-in-out fixed top-16 left-2 z-50 rounded-xl transform opacity-0 scale-95">
-            <li><a href="{% url 'home' %}" class="block hover:text-rose-800"> <i class="fas fa-home mr-2"></i> Home</a></li>
+            <!-- <li><a href="{% url 'home' %}" class="block hover:text-rose-800"> <i class="fas fa-home mr-2"></i> Home</a></li> -->
             
-                    {% if user.is_authenticated %}
-                    {% with user.profile as profile %}
+                    <!-- {% if user.is_authenticated %}
+                    {% with user.profile as profile %} -->
 
-                    <li>
-                        <!-- Expandable Account Menu -->
+                    <!-- <li>
+                       
                         <button id="account-toggle" class="flex items-center w-full hover:text-rose-800 focus:outline-none">
                             <i class="fas fa-user mr-2"></i> {{ profile.name }}
                             <i class="px-2 fas fa-chevron-down ml-auto transition-transform duration-300" id="account-chevron"></i>
@@ -207,18 +207,18 @@
                             <li><a href="{% url 'orders' %}" class="block hover:text-rose-800"><i class="fas fa-box mr-2"></i>Orders</a></li>
                             <li><a href="{% url 'logout' %}" class="block hover:text-rose-800"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a></li>
                         </ul>
-                    </li>
+                    </li> -->
 
-                    {% endwith %}
+                    <!-- {% endwith %} -->
 
-                        <li class="block">
+                        <!-- <li class="block">
                             
                         {% else %}
                             <a href="{% url 'login' %}" class="hover:text-rose-800"> <i class="fas fa-sign-in-alt mr-2"></i> Login</a>
                         
-                        </li>
+                        </li> -->
 
-                    {% endif %}
+                    <!-- {% endif %} -->
 
         </ul>
 

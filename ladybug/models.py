@@ -314,7 +314,6 @@ class Order(models.Model):
             self.review_sent = True
             super().save(update_fields=['review_sent'])
 
-
     def __str__(self):
         return f"Order #{self.id} - {self.user}"
 
@@ -337,8 +336,8 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"Item #{self.id} of Order #{self.order.id}"
-        
-        
+
+
 class ProductReview(models.Model):
     product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True)
     fabric = models.ForeignKey('Fabric', on_delete=models.SET_NULL, null=True, blank=True)
