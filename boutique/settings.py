@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^t+tvdhn1go-o7qnwmp1057z!!p!y)x=zgj7hh@ici$#gm+$vl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS = ["192.168.1.9"]
 
@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     'ladybug-8vnk.onrender.com',
     'ladybug-atelier.onrender.com',
     'ladybugatelier.com',
+    'www.ladybugatelier.com',
     'ladybug-atelier-dev.onrender.com'
     ]
 
